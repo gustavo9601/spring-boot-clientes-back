@@ -1,5 +1,7 @@
 package com.gmarquezp.back.springbootbackclientes.models.entity;
 
+import org.springframework.lang.Nullable;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -10,8 +12,11 @@ public class Cliente implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false, name = "nombre")
     private String nombre;
     private String apellido;
+    @Column(unique = true, nullable = false, name = "email")
+
     private String email;
     @Embedded
     private Auditoria auditoria;
