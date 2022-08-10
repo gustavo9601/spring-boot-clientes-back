@@ -9,7 +9,7 @@ import java.util.Date;
 public class Auditoria {
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP) // Para que se guarde en formato de fecha y hora
-    @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss") // Patron que se visualizara al retornar JSON
+    @JsonFormat(pattern = "yyyy/MM/dd") // Patron que se visualizara al retornar JSON
     private Date createdAt;
     @Column(name = "updated_at")
     @Temporal(TemporalType.TIMESTAMP)
