@@ -3,6 +3,8 @@ package com.gmarquezp.back.springbootbackclientes.models.services;
 import com.gmarquezp.back.springbootbackclientes.models.dao.IClienteDao;
 import com.gmarquezp.back.springbootbackclientes.models.entity.Cliente;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +21,12 @@ public class ClienteServiceImpl implements IClienteService {
     @Transactional(readOnly = true)
     public List<Cliente> findAll() {
         return this.clienteDao.findAll();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<Cliente> findAll(Pageable pageable) {
+        return this.clienteDao.findAll(pageable);
     }
 
     @Override
