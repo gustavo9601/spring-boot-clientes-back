@@ -1,10 +1,14 @@
 package com.gmarquezp.back.springbootbackclientes.models.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.Date;
 
 @Entity
 @Table(name = "clientes")
@@ -23,6 +27,12 @@ public class Cliente implements Serializable {
     @Column(unique = true, nullable = false, name = "email")
     @Email // Formato de email
     private String email;
+
+    @NotNull
+    @JsonFormat(pattern = "yyyy/MM/dd") // Patron que se visualizara al retornar JSON
+    @Column(name = "fecha_nacimiento")
+    private Date fechaNacimiento;
+
     @Embedded
     private Auditoria auditoria;
 
@@ -67,6 +77,14 @@ public class Cliente implements Serializable {
         this.auditoria = auditoria;
     }
 
+    public Date getFechaNacimiento() {
+        return fechaNacimiento;
+    }
+
+    public void setFechaNacimiento(Date fechaNacimiento) {
+        this.fechaNacimiento = fechaNacimiento;
+    }
+
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -76,6 +94,7 @@ public class Cliente implements Serializable {
                 ", nombre='" + nombre + '\'' +
                 ", apellido='" + apellido + '\'' +
                 ", email='" + email + '\'' +
+                ", fechaNacimiento=" + fechaNacimiento +
                 ", auditoria=" + auditoria +
                 '}';
     }
