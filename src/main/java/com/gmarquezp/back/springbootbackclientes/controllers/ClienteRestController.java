@@ -3,20 +3,31 @@ package com.gmarquezp.back.springbootbackclientes.controllers;
 import com.gmarquezp.back.springbootbackclientes.models.entity.Cliente;
 import com.gmarquezp.back.springbootbackclientes.models.services.IClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.web.ServerProperties;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatterBuilder;
+import java.util.*;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 // Se configuro desde la clase CorsConfiguration
 // Habilitando cors desde los origenes
@@ -29,6 +40,8 @@ public class ClienteRestController {
 
     @Autowired
     private IClienteService clienteService;
+
+    private final Logger log = Logger.getLogger(ClienteRestController.class.getName());
 
     @GetMapping("")
     public List<Cliente> index() {
@@ -153,13 +166,13 @@ public class ClienteRestController {
             Map<String, List<String>> erroresMap = new HashMap<>();
 
             result.getFieldErrors()
-                            .forEach((error) -> {
-                                if (erroresMap.containsKey(error.getField())) {
-                                    erroresMap.get(error.getField()).add(error.getDefaultMessage());
-                                } else {
-                                    erroresMap.put(error.getField(), new ArrayList<>(List.of(error.getDefaultMessage())));
-                                }
-                            });
+                    .forEach((error) -> {
+                        if (erroresMap.containsKey(error.getField())) {
+                            erroresMap.get(error.getField()).add(error.getDefaultMessage());
+                        } else {
+                            erroresMap.put(error.getField(), new ArrayList<>(List.of(error.getDefaultMessage())));
+                        }
+                    });
 
 
             response.put("errors", erroresMap);
@@ -186,9 +199,107 @@ public class ClienteRestController {
 
     }
 
+    @PostMapping("/upload")
+    public ResponseEntity<?> uploadFile(@RequestParam(name = "archivo") MultipartFile archivo,
+                                        @RequestParam(name = "id") Long id) {
+        Cliente cliente = this.clienteService.findById(id);
+
+        Map<String, Object> response = new HashMap<>();
+
+        if (!archivo.isEmpty()) {
+            String nombreArchivo = UUID.randomUUID().toString() + "_" + archivo.getOriginalFilename();
+
+            log.info("nombreArchivo=\t" + nombreArchivo);
+
+            // Paths.get(// Si directorio de sistema debe ir ruta relativa "c// | \opt\etc")
+            Path rutaArchivo = Paths.get("uploads")
+                    .resolve(nombreArchivo)
+                    .toAbsolutePath();
+
+            try {
+                // Copia y mueve el archivo a la ruta escogida
+                // StandardCopyOption.REPLACE_EXISTING // Si existe lo reemplaza
+                Files.copy(archivo.getInputStream(), rutaArchivo, StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                response.put("mensaje", "Error al subir el archivo con nombre:\t" + nombreArchivo);
+                return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
+
+            // Borrando archivo anterior
+            if (cliente.getFoto() != null && !cliente.getFoto().isEmpty()) {
+                Path rutaArchivoAnterior = Paths.get("uploads")
+                        .resolve(cliente.getFoto())
+                        .toAbsolutePath();
+                try {
+                    System.out.println("Eliminando archivo:\t" + rutaArchivoAnterior);
+                    Files.deleteIfExists(rutaArchivoAnterior);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            cliente.setFoto(nombreArchivo);
+            this.clienteService.save(cliente);
+
+            response.put("cliente", cliente);
+            response.put("mensaje", "El archivo con nombre: |" + nombreArchivo + "| ha sido cargado con éxito");
+
+            return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
+        }
+
+        response.put("mensaje", "No se subio ningun archivo =(");
+        return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+
+    @GetMapping("/upload/{nombreFoto:.+}") // :.+ // para que no trunque la extension
+    public ResponseEntity<Resource> verFoto(@PathVariable String nombreFoto) {
+        Path rutaArchivo = Paths.get("uploads")
+                .resolve(nombreFoto)
+                .toAbsolutePath();
+        Resource recurso = null;
+        try {
+            recurso = new UrlResource(rutaArchivo.toUri());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error: No se pudo cargar la foto");
+        }
+
+        // Validando que sea posible leer
+        if (!recurso.exists() && recurso.isReadable()) {
+            throw new RuntimeException("Error: No se pudo leer la foto");
+        }
+
+        // Cabeceras para que permita la descarga
+        HttpHeaders cabecera = new HttpHeaders();
+        cabecera.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + recurso.getFilename() + "\"");
+
+        log.info("recurso.getFilename()=\t" + recurso.getFilename());
+        
+        // Si no se agrega cabecera, retornara el recurso en binario
+        return new ResponseEntity<Resource>(recurso, cabecera, HttpStatus.OK);
+    }
+
+
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT) // 204
     public void delete(@PathVariable Long id) {
+
+        Cliente cliente = this.clienteService.findById(id);
+        // Borrando imagen de tener anterior
+        if (cliente.getFoto() != null && !cliente.getFoto().isEmpty()) {
+            Path rutaArchivoAnterior = Paths.get("uploads")
+                    .resolve(cliente.getFoto())
+                    .toAbsolutePath();
+            try {
+                System.out.println("Eliminando archivo:\t" + rutaArchivoAnterior);
+                Files.deleteIfExists(rutaArchivoAnterior);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
         this.clienteService.delete(id);
     }
 }

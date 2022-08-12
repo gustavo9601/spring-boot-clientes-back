@@ -1,6 +1,7 @@
 package com.gmarquezp.back.springbootbackclientes.models.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -32,6 +33,9 @@ public class Cliente implements Serializable {
     @JsonFormat(pattern = "yyyy/MM/dd") // Patron que se visualizara al retornar JSON
     @Column(name = "fecha_nacimiento")
     private Date fechaNacimiento;
+
+    @Nullable
+    private String foto;
 
     @Embedded
     private Auditoria auditoria;
@@ -85,6 +89,15 @@ public class Cliente implements Serializable {
         this.fechaNacimiento = fechaNacimiento;
     }
 
+    @Nullable
+    public String getFoto() {
+        return foto;
+    }
+
+    public void setFoto(@Nullable String foto) {
+        this.foto = foto;
+    }
+
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -96,6 +109,7 @@ public class Cliente implements Serializable {
                 ", email='" + email + '\'' +
                 ", fechaNacimiento=" + fechaNacimiento +
                 ", auditoria=" + auditoria +
+                ", foto=" + foto +
                 '}';
     }
 }
