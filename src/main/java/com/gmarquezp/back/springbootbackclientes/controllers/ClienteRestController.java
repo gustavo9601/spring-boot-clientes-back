@@ -2,6 +2,7 @@ package com.gmarquezp.back.springbootbackclientes.controllers;
 
 import com.gmarquezp.back.springbootbackclientes.models.entity.Cliente;
 import com.gmarquezp.back.springbootbackclientes.models.services.IClienteService;
+import com.gmarquezp.back.springbootbackclientes.models.services.IUploadFileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.core.io.Resource;
@@ -40,6 +41,9 @@ public class ClienteRestController {
 
     @Autowired
     private IClienteService clienteService;
+
+    @Autowired
+    private IUploadFileService uploadFileService;
 
     private final Logger log = Logger.getLogger(ClienteRestController.class.getName());
 
@@ -207,43 +211,27 @@ public class ClienteRestController {
         Map<String, Object> response = new HashMap<>();
 
         if (!archivo.isEmpty()) {
-            String nombreArchivo = UUID.randomUUID().toString() + "_" + archivo.getOriginalFilename();
-
-            log.info("nombreArchivo=\t" + nombreArchivo);
-
-            // Paths.get(// Si directorio de sistema debe ir ruta relativa "c// | \opt\etc")
-            Path rutaArchivo = Paths.get("uploads")
-                    .resolve(nombreArchivo)
-                    .toAbsolutePath();
-
+            String archivoGuardado = null;
             try {
-                // Copia y mueve el archivo a la ruta escogida
-                // StandardCopyOption.REPLACE_EXISTING // Si existe lo reemplaza
-                Files.copy(archivo.getInputStream(), rutaArchivo, StandardCopyOption.REPLACE_EXISTING);
+
+                archivoGuardado = this.uploadFileService.guardar(archivo);
+
             } catch (IOException e) {
-                response.put("mensaje", "Error al subir el archivo con nombre:\t" + nombreArchivo);
+                response.put("mensaje", "Error al subir el archivo con nombre:\t" + archivoGuardado);
                 return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
 
             // Borrando archivo anterior
             if (cliente.getFoto() != null && !cliente.getFoto().isEmpty()) {
-                Path rutaArchivoAnterior = Paths.get("uploads")
-                        .resolve(cliente.getFoto())
-                        .toAbsolutePath();
-                try {
-                    System.out.println("Eliminando archivo:\t" + rutaArchivoAnterior);
-                    Files.deleteIfExists(rutaArchivoAnterior);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                this.uploadFileService.eliminar(cliente.getFoto());
             }
 
-            cliente.setFoto(nombreArchivo);
+            cliente.setFoto(archivoGuardado);
             this.clienteService.save(cliente);
 
             response.put("cliente", cliente);
-            response.put("mensaje", "El archivo con nombre: |" + nombreArchivo + "| ha sido cargado con éxito");
+            response.put("mensaje", "El archivo con nombre: |" + archivoGuardado + "| ha sido cargado con éxito");
 
             return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
         }
@@ -255,30 +243,22 @@ public class ClienteRestController {
 
     @GetMapping("/upload/{nombreFoto:.+}") // :.+ // para que no trunque la extension
     public ResponseEntity<Resource> verFoto(@PathVariable String nombreFoto) {
-        Path rutaArchivo = Paths.get("uploads")
-                .resolve(nombreFoto)
-                .toAbsolutePath();
-        Resource recurso = null;
+        Resource fotoResource = null;
         try {
-            recurso = new UrlResource(rutaArchivo.toUri());
+            fotoResource = this.uploadFileService.cargar(nombreFoto);
         } catch (MalformedURLException e) {
             e.printStackTrace();
             throw new RuntimeException("Error: No se pudo cargar la foto");
         }
 
-        // Validando que sea posible leer
-        if (!recurso.exists() && recurso.isReadable()) {
-            throw new RuntimeException("Error: No se pudo leer la foto");
-        }
-
         // Cabeceras para que permita la descarga
         HttpHeaders cabecera = new HttpHeaders();
-        cabecera.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + recurso.getFilename() + "\"");
+        cabecera.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fotoResource.getFilename() + "\"");
 
-        log.info("recurso.getFilename()=\t" + recurso.getFilename());
-        
+        log.info("recurso.getFilename()=\t" + fotoResource.getFilename());
+
         // Si no se agrega cabecera, retornara el recurso en binario
-        return new ResponseEntity<Resource>(recurso, cabecera, HttpStatus.OK);
+        return new ResponseEntity<Resource>(fotoResource, cabecera, HttpStatus.OK);
     }
 
 
@@ -289,15 +269,7 @@ public class ClienteRestController {
         Cliente cliente = this.clienteService.findById(id);
         // Borrando imagen de tener anterior
         if (cliente.getFoto() != null && !cliente.getFoto().isEmpty()) {
-            Path rutaArchivoAnterior = Paths.get("uploads")
-                    .resolve(cliente.getFoto())
-                    .toAbsolutePath();
-            try {
-                System.out.println("Eliminando archivo:\t" + rutaArchivoAnterior);
-                Files.deleteIfExists(rutaArchivoAnterior);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            this.uploadFileService.eliminar(cliente.getFoto());
         }
 
         this.clienteService.delete(id);
