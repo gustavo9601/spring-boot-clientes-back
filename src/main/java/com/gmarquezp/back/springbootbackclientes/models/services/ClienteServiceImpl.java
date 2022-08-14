@@ -1,7 +1,9 @@
 package com.gmarquezp.back.springbootbackclientes.models.services;
 
 import com.gmarquezp.back.springbootbackclientes.models.dao.IClienteDao;
+import com.gmarquezp.back.springbootbackclientes.models.dao.IRegionDao;
 import com.gmarquezp.back.springbootbackclientes.models.entity.Cliente;
+import com.gmarquezp.back.springbootbackclientes.models.entity.Region;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,11 +18,14 @@ public class ClienteServiceImpl implements IClienteService {
     @Autowired
     private IClienteDao clienteDao;
 
+    @Autowired
+    private IRegionDao regionDao;
+
     // Permite manejar transaccionalidad
     @Override
     @Transactional(readOnly = true)
     public List<Cliente> findAll() {
-        return this.clienteDao.findAll();
+        return this.clienteDao.findAllWithRegiones();
     }
 
     @Override
@@ -46,5 +51,11 @@ public class ClienteServiceImpl implements IClienteService {
     @Transactional
     public void delete(Long id) {
         this.clienteDao.deleteById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Region> findAllRegions() {
+        return this.regionDao.findAllRegiones();
     }
 }

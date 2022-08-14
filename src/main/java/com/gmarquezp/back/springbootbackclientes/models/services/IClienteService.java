@@ -1,6 +1,7 @@
 package com.gmarquezp.back.springbootbackclientes.models.services;
 
 import com.gmarquezp.back.springbootbackclientes.models.entity.Cliente;
+import com.gmarquezp.back.springbootbackclientes.models.entity.Region;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -18,4 +19,5 @@ public interface IClienteService {
 
     public void delete(Long id);
 
+    public List<Region> findAllRegions();
 }

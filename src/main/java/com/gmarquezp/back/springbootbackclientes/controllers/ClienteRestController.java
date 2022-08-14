@@ -1,6 +1,7 @@
 package com.gmarquezp.back.springbootbackclientes.controllers;
 
 import com.gmarquezp.back.springbootbackclientes.models.entity.Cliente;
+import com.gmarquezp.back.springbootbackclientes.models.entity.Region;
 import com.gmarquezp.back.springbootbackclientes.models.services.IClienteService;
 import com.gmarquezp.back.springbootbackclientes.models.services.IUploadFileService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -188,6 +189,7 @@ public class ClienteRestController {
             clienteActual.setNombre(cliente.getNombre());
             clienteActual.setApellido(cliente.getApellido());
             clienteActual.setEmail(cliente.getEmail());
+            clienteActual.setRegion(cliente.getRegion());
             this.clienteService.save(clienteActual);
 
             response.put("mensaje", "El cliente ha sido actualizado con éxito");
@@ -273,5 +275,11 @@ public class ClienteRestController {
         }
 
         this.clienteService.delete(id);
+    }
+
+
+    @GetMapping("/regiones")
+    public List<Region> getRegiones() {
+        return this.clienteService.findAllRegions();
     }
 }

@@ -1,6 +1,8 @@
 package com.gmarquezp.back.springbootbackclientes.models.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
@@ -23,7 +25,7 @@ public class Cliente implements Serializable {
     @Size(min = 3, max = 50) // Tamaño minimo y maximo
     private String nombre;
 
-    @NotEmpty(message = "{validation.apellido.NotEmpty}") // Uamos el mensaje de ValidationMessages.properties, configurando  en MvcConfig
+    @NotEmpty(message = "{validation.apellido.NotEmpty}") // Usamos el mensaje de ValidationMessages.properties, configurando  en MvcConfig
     private String apellido;
     @Column(unique = true, nullable = false, name = "email")
     @Email // Formato de email
@@ -39,6 +41,13 @@ public class Cliente implements Serializable {
 
     @Embedded
     private Auditoria auditoria;
+
+    // una region puede tener muchos clientes, pero un cliente una region
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "region_id") // Nombre de la columna en cliente
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // Para que no se devuelva el objeto Region en el JSON
+    private Region region;
 
     public Long getId() {
         return id;
@@ -96,6 +105,14 @@ public class Cliente implements Serializable {
 
     public void setFoto(@Nullable String foto) {
         this.foto = foto;
+    }
+
+    public Region getRegion() {
+        return region;
+    }
+
+    public void setRegion(Region region) {
+        this.region = region;
     }
 
     private static final long serialVersionUID = 1L;
