@@ -51,7 +51,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 
         clients.inMemory()
                 .withClient("angular") // id del cliente que se conectara
-                .secret(passwordEncoder.encode("123"))
+                .secret(passwordEncoder.encode("12345"))
                 .scopes("read", "write") // permiso que tendra el cliente sobre la app
                 .authorizedGrantTypes("password", "refresh_token") // tipo de token
                 .accessTokenValiditySeconds(3600) // tiempo de validez del token

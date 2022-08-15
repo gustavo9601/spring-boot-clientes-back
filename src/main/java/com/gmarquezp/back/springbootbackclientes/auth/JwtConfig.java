@@ -34,4 +34,5 @@ public class JwtConfig {
             "MWZjniQMwadQmOlEaeTTROzExoTcs10z8fvMOFcFdhomhGFwT4MNIdoKMBFoIWoK\n" +
             "zmuzVRvonpciqMKF51u0koC4gowWI6U5iuzr+pRHcVLFzPNMlWkn7ckFn6OFk4Ln\n" +
             "pGdaElg41ZEkBEZHkvcTO+WFhx0qMFE0ipGYjCBki+x0WxKpivAh";
+
 }

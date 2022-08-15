@@ -32,7 +32,7 @@ public class SpringBootBackClientesApplication implements CommandLineRunner {
         System.out.println("*".repeat(100));
         System.out.println("Iniciando bien =)");
 
-        String password = this.passwordEncoder.encode("123");
+        String password = this.passwordEncoder.encode("12345");
         System.out.println("password = " + password);
     }
 }
