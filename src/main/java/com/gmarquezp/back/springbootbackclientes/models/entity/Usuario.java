@@ -20,7 +20,7 @@ public class Usuario implements Serializable {
 
     // Relacion muchos a muchos
     // CascadeType.ALL // Si se crea un usuario se le asigna el rol, si se eli8mina se borra el rol
-    @ManyToMany(fetch = FetchType.LAZY
+    @ManyToMany(fetch = FetchType.EAGER
             , cascade = CascadeType.ALL)
     @JoinTable(name = "usuarios_roles", // // por dfault crera la tabla pivote usuarios_roles
             joinColumns = @JoinColumn(name = "usuario_id"),
@@ -32,6 +32,11 @@ public class Usuario implements Serializable {
     @Embedded
     private Auditoria auditoria;
 
+
+    private String apellido;
+    private String nombre;
+    @Column(unique = true, length = 200)
+    private String email;
 
     public Long getId() {
         return id;
@@ -81,6 +86,44 @@ public class Usuario implements Serializable {
         this.auditoria = auditoria;
     }
 
+    public String getApellido() {
+        return apellido;
+    }
+
+    public void setApellido(String apellido) {
+        this.apellido = apellido;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     private static final long serialVersionUID = 1L;
 
+    @Override
+    public String toString() {
+        return "Usuario{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", enabled=" + enabled +
+                ", roles=" + roles +
+                ", auditoria=" + auditoria +
+                ", apellido='" + apellido + '\'' +
+                ", nombre='" + nombre + '\'' +
+                ", email='" + email + '\'' +
+                '}';
+    }
 }

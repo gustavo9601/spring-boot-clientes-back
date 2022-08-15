@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
@@ -63,6 +64,7 @@ public class ClienteRestController {
      * public ResponseEntity<?> // Clase que permite controlar la respuesta si ocurre algun error
      * */
     @GetMapping("/{id}")
+    @Secured({"ROLE_ADMIN", "ROLE_USER"}) // Solo los usuarios con estos roles pueden acceder a este metodo
     public ResponseEntity<?> show(@PathVariable Long id) {
         Cliente cliente = null;
         Map<String, Object> response = new HashMap<>();
@@ -90,6 +92,7 @@ public class ClienteRestController {
      * @RequestBody // Se recibe el objeto en el body
      * BindingResult // Contiene la validacion sobre el objeto
      * */
+    @Secured("ROLE_ADMIN")
 
     public ResponseEntity<?> create(@Valid @RequestBody Cliente cliente, BindingResult result) {
         System.out.println("cliente = " + cliente);
@@ -151,6 +154,7 @@ public class ClienteRestController {
     }
 
     @PutMapping("/{id}")
+    @Secured("ROLE_ADMIN")
     @ResponseStatus(HttpStatus.CREATED) // 201
     public ResponseEntity<?> update(@Valid @RequestBody Cliente cliente,
                                     BindingResult result,
@@ -206,6 +210,7 @@ public class ClienteRestController {
     }
 
     @PostMapping("/upload")
+    @Secured({"ROLE_ADMIN", "ROLE_USER"})
     public ResponseEntity<?> uploadFile(@RequestParam(name = "archivo") MultipartFile archivo,
                                         @RequestParam(name = "id") Long id) {
         Cliente cliente = this.clienteService.findById(id);
@@ -265,6 +270,7 @@ public class ClienteRestController {
 
 
     @DeleteMapping("/{id}")
+    @Secured("ROLE_ADMIN")
     @ResponseStatus(HttpStatus.NO_CONTENT) // 204
     public void delete(@PathVariable Long id) {
 
@@ -279,6 +285,7 @@ public class ClienteRestController {
 
 
     @GetMapping("/regiones")
+    @Secured("ROLE_ADMIN")
     public List<Region> getRegiones() {
         return this.clienteService.findAllRegions();
     }
