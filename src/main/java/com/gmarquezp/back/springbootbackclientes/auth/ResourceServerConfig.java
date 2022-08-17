@@ -25,6 +25,8 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
         * */
         http.authorizeRequests()
                 .antMatchers(HttpMethod.GET, "/api/clientes", "/api/clientes/page/**", "/api/clientes/upload/**").permitAll() // Permitimos el acceso a todos los clientes AL REQUEST GET
+                .antMatchers("/api/clientes/{id}").permitAll()
+                .antMatchers("/api/facturas/**").permitAll()
                 // .antMatchers(HttpMethod.GET, "/api/clientes/{id}").hasAnyRole("ADMIN", "USER") // Acceso a usuarios de rol admin y user
                 // .antMatchers(HttpMethod.POST, "/api/clientes/upload").hasAnyRole("ADMIN", "USER")
                 // .antMatchers(HttpMethod.POST, "/api/clientes").hasRole("ADMIN")

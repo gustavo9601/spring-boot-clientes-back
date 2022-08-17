@@ -64,7 +64,7 @@ public class ClienteRestController {
      * public ResponseEntity<?> // Clase que permite controlar la respuesta si ocurre algun error
      * */
     @GetMapping("/{id}")
-    @Secured({"ROLE_ADMIN", "ROLE_USER"}) // Solo los usuarios con estos roles pueden acceder a este metodo
+    // @Secured({"ROLE_ADMIN", "ROLE_USER"}) // Solo los usuarios con estos roles pueden acceder a este metodo
     public ResponseEntity<?> show(@PathVariable Long id) {
         Cliente cliente = null;
         Map<String, Object> response = new HashMap<>();

@@ -1,5 +1,6 @@
 package com.gmarquezp.back.springbootbackclientes.models.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.DatabindException;
 
 import javax.persistence.*;
@@ -24,6 +25,8 @@ public class Factura implements Serializable {
     // Muchas facturas tienen un cliente
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cliente_id") // Llave con la tabla clientes
+    @JsonIgnoreProperties({"facturas", "hibernateLazyInitializer", "handler"})
+    // Para ignorar propiedades de la relacion inversa en el JSON, para no se llame en un loop infinito
     private Cliente cliente;
 
 
@@ -31,6 +34,9 @@ public class Factura implements Serializable {
     @OneToMany(fetch = FetchType.LAZY,
             cascade = CascadeType.ALL)
     @JoinColumn(name = "factura_id") // Llave foranea en facturas_items
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    // Para ignorar propiedads de la relacion inversa en el JSON
+
     private List<ItemFactura> itemsFacturas;
 
     @Embedded

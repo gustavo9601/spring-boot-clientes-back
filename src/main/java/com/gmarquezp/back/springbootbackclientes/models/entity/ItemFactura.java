@@ -1,5 +1,7 @@
 package com.gmarquezp.back.springbootbackclientes.models.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -15,6 +17,8 @@ public class ItemFactura implements Serializable {
     // Muchos items pueden tener un producto
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "producto_id") // Llave foranea en facturas_items
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // Para ignorar propiedads de la relacion inversa en el JSON
+
     private Producto producto;
 
     public Long getId() {

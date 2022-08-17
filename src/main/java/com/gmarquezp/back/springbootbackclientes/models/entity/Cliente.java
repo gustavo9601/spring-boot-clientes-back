@@ -48,13 +48,15 @@ public class Cliente implements Serializable {
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "region_id") // Nombre de la columna en cliente
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // Para que no se devuelva el objeto Region en el JSON
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // Para ignorar propiedads de la relacion inversa en el JSON
     private Region region;
 
     // Un Cliente tiene muchas facturas
     @OneToMany(mappedBy = "cliente",  // Nombre de la relacion en Factura, para hacerla bidireccional
             fetch = FetchType.LAZY,
             cascade = CascadeType.ALL)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // Para ignorar propiedads de la relacion inversa en el JSON
+
     private List<Factura> facturas;
 
     public Cliente() {
