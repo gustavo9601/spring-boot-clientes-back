@@ -18,7 +18,6 @@ public class ItemFactura implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "producto_id") // Llave foranea en facturas_items
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // Para ignorar propiedads de la relacion inversa en el JSON
-
     private Producto producto;
 
     public Long getId() {
@@ -39,6 +38,14 @@ public class ItemFactura implements Serializable {
 
     public Double getImporte(){
         return this.getCantidad() * this.producto.getPrecio();
+    }
+
+    public Producto getProducto() {
+        return producto;
+    }
+
+    public void setProducto(Producto producto) {
+        this.producto = producto;
     }
 
     // serializable

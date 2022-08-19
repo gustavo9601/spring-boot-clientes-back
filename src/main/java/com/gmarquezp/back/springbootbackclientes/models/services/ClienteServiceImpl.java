@@ -1,8 +1,10 @@
 package com.gmarquezp.back.springbootbackclientes.models.services;
 
 import com.gmarquezp.back.springbootbackclientes.models.dao.IClienteDao;
+import com.gmarquezp.back.springbootbackclientes.models.dao.IFacturaDao;
 import com.gmarquezp.back.springbootbackclientes.models.dao.IRegionDao;
 import com.gmarquezp.back.springbootbackclientes.models.entity.Cliente;
+import com.gmarquezp.back.springbootbackclientes.models.entity.Factura;
 import com.gmarquezp.back.springbootbackclientes.models.entity.Region;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -20,6 +22,9 @@ public class ClienteServiceImpl implements IClienteService {
 
     @Autowired
     private IRegionDao regionDao;
+
+    @Autowired
+    private IFacturaDao facturaDao;
 
     // Permite manejar transaccionalidad
     @Override
@@ -57,5 +62,25 @@ public class ClienteServiceImpl implements IClienteService {
     @Transactional(readOnly = true)
     public List<Region> findAllRegions() {
         return this.regionDao.findAllRegiones();
+    }
+
+
+    @Override
+    @Transactional(readOnly = true)
+    public Factura findFacturaById(Long id) {
+        return this.facturaDao.findById(id)
+                .orElse(null);
+    }
+
+    @Override
+    @Transactional(readOnly = false)
+    public Factura saveFactura(Factura factura) {
+        return this.facturaDao.save(factura);
+    }
+
+    @Override
+    @Transactional(readOnly = false)
+    public void deleteFacturaById(Long id) {
+        facturaDao.deleteById(id);
     }
 }

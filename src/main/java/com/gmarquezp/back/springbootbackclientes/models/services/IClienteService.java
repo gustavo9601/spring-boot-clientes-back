@@ -1,6 +1,7 @@
 package com.gmarquezp.back.springbootbackclientes.models.services;
 
 import com.gmarquezp.back.springbootbackclientes.models.entity.Cliente;
+import com.gmarquezp.back.springbootbackclientes.models.entity.Factura;
 import com.gmarquezp.back.springbootbackclientes.models.entity.Region;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,4 +21,9 @@ public interface IClienteService {
     public void delete(Long id);
 
     public List<Region> findAllRegions();
+
+    public Factura findFacturaById(Long id);
+    public Factura saveFactura(Factura factura);
+    public void deleteFacturaById(Long id);
+
 }
