@@ -2,6 +2,7 @@ package com.gmarquezp.back.springbootbackclientes.models.services;
 
 import com.gmarquezp.back.springbootbackclientes.models.entity.Cliente;
 import com.gmarquezp.back.springbootbackclientes.models.entity.Factura;
+import com.gmarquezp.back.springbootbackclientes.models.entity.Producto;
 import com.gmarquezp.back.springbootbackclientes.models.entity.Region;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,5 +26,7 @@ public interface IClienteService {
     public Factura findFacturaById(Long id);
     public Factura saveFactura(Factura factura);
     public void deleteFacturaById(Long id);
+
+    public List<Producto> findProductoByNombre(String nombre);
 
 }

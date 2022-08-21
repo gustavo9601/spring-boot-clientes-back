@@ -25,7 +25,7 @@ public class Factura implements Serializable {
     // Muchas facturas tienen un cliente
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cliente_id") // Llave con la tabla clientes
-    @JsonIgnoreProperties({"facturas", "hibernateLazyInitializer", "handler"})
+    @JsonIgnoreProperties(value= {"facturas", "hibernateLazyInitializer", "handler"}, allowSetters = true)
     // Para ignorar propiedades de la relacion inversa en el JSON, para no se llame en un loop infinito
     private Cliente cliente;
 

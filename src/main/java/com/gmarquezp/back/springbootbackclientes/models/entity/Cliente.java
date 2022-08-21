@@ -55,7 +55,7 @@ public class Cliente implements Serializable {
     @OneToMany(mappedBy = "cliente",  // Nombre de la relacion en Factura, para hacerla bidireccional
             fetch = FetchType.LAZY,
             cascade = CascadeType.ALL)
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // Para ignorar propiedads de la relacion inversa en el JSON
+    @JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler"},allowSetters = true) // Para ignorar propiedads de la relacion inversa en el JSON
 
     private List<Factura> facturas;
 
