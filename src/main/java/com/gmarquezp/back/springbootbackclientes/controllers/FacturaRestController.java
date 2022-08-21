@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/facturas")
-@CrossOrigin(origins = {"http://localhost:4200"}) // Cors manual
+@CrossOrigin(origins = {"http://localhost:4200", "*"}) // Cors manual
 
 public class FacturaRestController {
 
